@@ -7,6 +7,7 @@ class portViz:
 
     def byAsset(self):
 
+        "Bar graph of each holding in the portfolio"
         con = sqlite3.connect(self.dbName)
         cur = con.cursor()
         assets = pd.read_sql("SELECT * FROM Valuation order by exposure desc",con)
@@ -17,6 +18,7 @@ class portViz:
 
     def byAssetClass(self):
 
+        """Pie graph of the portfolio broken down by asset type"""
         con = sqlite3.connect(self.dbName)
         cur = con.cursor()
         assets = pd.read_sql("SELECT SUM(Exposure) as Exposure,Type FROM Valuation GROUP BY TYPE",con)
@@ -27,8 +29,23 @@ class portViz:
         con.close()
         return plt.show()
 
+    def assetTypeWeightings(self, type='Stocks'):
+        """Produces a pie graph broken down by type"""
+        con = sqlite3.connect(self.dbName)
+        cur = con.cursor()
+        sql = "Select Exposure, Asset from Valuation WHERE type = '" + type + "'"
+        assets = pd.read_sql(sql,con)
+        fig = plt.figure()
+        ax = fig.add_axes([0,0,1,1])
+        ax.axis('equal')
+        ax.pie(assets['Exposure'],labels=assets['Asset'],autopct='%1.2f%%')
+        con.close()
+        return plt.show()
+
 
     def portfolioValuation(self):
+
+        """Shows a line graph of the portfolio value over time"""
 
         con = sqlite3.connect(self.dbName)
         cur = con.cursor()
